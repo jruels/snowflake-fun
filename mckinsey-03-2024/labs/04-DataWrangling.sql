@@ -4,13 +4,13 @@
 3) Querying JSON data
 ----------------------------------------------------------------------------------*/
 
--- 6.1.1
+-- 4.1.1
 use role accountadmin;
 drop database if exists weather;
 
 grant all on warehouse compute_wh to sysadmin;
 
--- 6.1.2
+-- 4.1.2
 
 use role sysadmin;
 use warehouse compute_wh;
@@ -20,30 +20,30 @@ use schema public;
 create database if not exists weather;
 use database weather;
 
--- 6.1.3
+-- 4.1.3
 
 create table json_weather_data (v variant);
 
--- 6.2.1
+-- 4.2.1
 
 create stage nyc_weather
 url = 's3://snowflake-workshop-lab/weather-nyc';
 
--- 6.2.2 
+-- 4.2.2 
 
 list @nyc_weather;
 
--- 6.3.1
+-- 4.3.1
 
 copy into json_weather_data 
 from @nyc_weather 
 file_format = (type=json);
 
--- 6.3.2
+-- 4.3.2
 
 select * from json_weather_data limit 10;
 
--- 6.4.1
+-- 4.4.1
 
 create view json_weather_data_view as
 select
@@ -65,13 +65,13 @@ select
 from json_weather_data
 where city_id = 5128638;
 
--- 6.4.4
+-- 4.4.4
 
 select * from json_weather_data_view
 where date_trunc('month',observation_time) = '2018-01-01' 
 limit 20;
 
--- 6.5.1
+-- 4.5.1
 
 select weather as conditions
     ,count(*) as num_trips
