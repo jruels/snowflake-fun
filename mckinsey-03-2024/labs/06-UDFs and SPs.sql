@@ -1,23 +1,22 @@
-/*----------------Snowflake Fundamentals 3-day class Lab:---------------------------
+/*----------------Snowflake Fundamentals 4-day class Lab:---------------------------
 1) User Defined Functions (UDFs)
 2) External Functions
 3) Stored Procedures
 ----------------------------------------------------------------------------------*/
 
-USE ROLE ACCOUNTADMIN;
-GRANT ALL ON WAREHOUSE COMPUTE_WH TO ROLE SYSADMIN;
-
 -- Set context 
-USE ROLE SYSADMIN;
+USE ROLE ACCOUNTADMIN;
 USE WAREHOUSE COMPUTE_WH;
 
 -- Create demo database and schema
 CREATE DATABASE IF NOT EXISTS DEMO_DB;
-CREATE SCHEMA IF NOT EXISTS DEMO_SCHEMA;
+CREATE SCHEMA IF NOT EXISTS DEMO_DB.DEMO_SCHEMA;
 
 --Set context
-USE DATABASE DEMO_DB;
-USE SCHEMA DEMO_SCHEMA;
+-- USE DATABASE DEMO_DB;
+USE SCHEMA DEMO_DB.DEMO_SCHEMA;
+
+SELECT CURRENT_SCHEMA(), CURRENT_DATABASE()
 
 --User Defined Functions
 
@@ -117,6 +116,29 @@ SET use_abbr = TRUE;
 SELECT JS_DAY_NAME_ON(days, $use_abbr) js_udf_dow, JS_DAY_NAME_ON(days) udf_dow
 FROM (VALUES (100), (200), (300)) AS t(days);
 
+CREATE OR REPLACE FUNCTION PY_DAY_NAME_ON(num_of_days INT)
+RETURNS STRING
+LANGUAGE PYTHON
+RUNTIME_VERSION = '3.8'
+HANDLER = 'calculate_day_name'
+AS
+$$
+def calculate_day_name(num_of_days):
+    import datetime
+    from datetime import timedelta
+    today = datetime.date.today()
+    future_date = today + timedelta(days=num_of_days)
+    day_name = future_date.strftime('%A')
+    return f'In {num_of_days} days it will be a {day_name}'
+$$;
+
+
+SELECT PY_DAY_NAME_ON(100) PY_DOW;
+
+
+SELECT dayname(dateadd(day, days, current_date())) day_of_week, JS_DAY_NAME_ON(days) js_udf_dow, PY_DAY_NAME_ON(days) py_udf_dow
+FROM (VALUES (100), (200), (300)) AS t(days);
+
 
 -- External Function (not going to work, but rather give you an idea how it may work)
 /* 
@@ -187,29 +209,6 @@ CALL TRUNCATE_ALL_TABLES_IN_SCHEMA('DEMO_DB', 'DEMO_SCHEMA');
 SELECT COUNT(*) FROM DEMO_TABLE1;
 SELECT COUNT(*) FROM DEMO_TABLE2;
 
-
-CREATE OR REPLACE FUNCTION PY_DAY_NAME_ON(num_of_days INT)
-RETURNS STRING
-LANGUAGE PYTHON
-RUNTIME_VERSION = '3.8'
-HANDLER = 'calculate_day_name'
-AS
-$$
-def calculate_day_name(num_of_days):
-    import datetime
-    from datetime import timedelta
-    today = datetime.date.today()
-    future_date = today + timedelta(days=num_of_days)
-    day_name = future_date.strftime('%A')
-    return f'In {num_of_days} days it will be a {day_name}'
-$$;
-
-
-SELECT PY_DAY_NAME_ON(100) PY_DOW;
-
-
-SELECT dayname(dateadd(day, days, current_date())) day_of_week, JS_DAY_NAME_ON(days) js_udf_dow, PY_DAY_NAME_ON(days) py_udf_dow
-FROM (VALUES (100), (200), (300)) AS t(days);
 
 
 -- Clear objects
