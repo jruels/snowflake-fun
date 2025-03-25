@@ -1,49 +1,43 @@
-/*----------------Snowflake Fundamentals 3-day class Lab:---------------------------
+/*----------------Snowflake Fundamentals 4-day class Lab:---------------------------
 1) Data Wrangling
 2) Storing JSON data
 3) Querying JSON data
 ----------------------------------------------------------------------------------*/
 
--- 4.1.1
 use role accountadmin;
 drop database if exists weather;
 
 grant all on warehouse compute_wh to sysadmin;
 
--- 4.1.2
 
 use role sysadmin;
 use warehouse compute_wh;
 
-use schema public;
 
 create database if not exists weather;
 use database weather;
+use schema public;
 
--- 4.1.3
 
 create table json_weather_data (v variant);
 
--- 4.2.1
 
 create stage nyc_weather
 url = 's3://snowflake-workshop-lab/weather-nyc';
 
--- 4.2.2 
+
 
 list @nyc_weather;
 
--- 4.3.1
+
 
 copy into json_weather_data 
 from @nyc_weather 
 file_format = (type=json);
 
--- 4.3.2
 
 select * from json_weather_data limit 10;
 
--- 4.4.1
 
 create view json_weather_data_view as
 select
@@ -65,13 +59,11 @@ select
 from json_weather_data
 where city_id = 5128638;
 
--- 4.4.4
 
 select * from json_weather_data_view
 where date_trunc('month',observation_time) = '2018-01-01' 
 limit 20;
 
--- 4.5.1
 
 select weather as conditions
     ,count(*) as num_trips
