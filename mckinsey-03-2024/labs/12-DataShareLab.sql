@@ -19,24 +19,28 @@ GRANT SELECT ON TABLE DEMO_DB.SCOTT.EMP TO SHARE my_share;
 -- Create a reader account
 CREATE MANAGED ACCOUNT DEMO_READER_ACCOUNT 
 admin_name='admin', 
-admin_password='Passw0rd', 
+admin_password='Passw0rd12345678', 
 type=reader;
 
-{"accountName":"DEMO_READER_ACCOUNT",
- "accountLocator":"YFB12038",
- "url":"https://wtjnyzl-demo_reader_account.snowflakecomputing.com",
- "accountLocatorUrl":"https://yfb12038.us-east-1.snowflakecomputing.com"}
+{
+"accountName":"DEMO_READER_ACCOUNT",
+"accountLocator":"OLB26468",
+"url":"https://tyixbci-demo_reader_account.snowflakecomputing.com",
+"accountLocatorUrl":"https://olb26468.us-east-1.snowflakecomputing.com"
+}
 
 SHOW MANAGED ACCOUNTS;
 
-ALTER MANAGED ACCOUNT DEMO_READER_ACCOUNT ADD SHARE my_share;
+--ALTER MANAGED ACCOUNT DEMO_READER_ACCOUNT ADD SHARE my_share;
 
 -- Add Accounts
-ALTER SHARE my_share ADD ACCOUNTS = VKB39446, YFB12038;
+ALTER SHARE my_share ADD ACCOUNTS = OLB26468;
 
 SHOW SHARES;
 SHOW GRANTS ON SHARE MY_SHARE;
 SHOW GRANTS TO SHARE MY_SHARE;
+
+SELECT CURRENT_ACCOUNT()
 
  
 -- !!! EXECUTE FROM WITHIN READER ACCOUNT !!! --
@@ -79,11 +83,21 @@ FROM demo_db.scott.emp
 WHERE job='ANALYST';
 
 GRANT SELECT ON VIEW demo_db.scott.analysts TO SHARE MY_SHARE;
+GRANT SELECT ON TABLE demo_db.scott.dept TO SHARE MY_SHARE;
+
+
+CREATE TABLE DEMO_DB.DEMO_SCHEMA.TRIPS CLONE CITIBIKE.PUBLIC.TRIPS
+
+GRANT USAGE ON SCHEMA DEMO_DB.DEMO_SCHEMA TO SHARE my_share;
+GRANT SELECT ON TABLE DEMO_DB.DEMO_SCHEMA.TRIPS TO SHARE my_share;
+
+
+REVOKE SELECT ON VIEW demo_db.scott.analysts FROM SHARE MY_SHARE;
 
 -- !!! EXECUTE FROM WITHIN READER ACCOUNT !!! --
 
 SELECT *
-FROM demo_db.scott.analysts;
+FROM demo_db_reader.scott.analysts;
 
 -- !!! EXECUTE FROM WITHIN PROVIDER ACCOUNT !!! --
 
