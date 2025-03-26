@@ -48,6 +48,7 @@ WITH x AS (
 SELECT dayname(dateadd(day, days, current_date())) day_of_week, DAY_NAME_ON(days) udf_dow
 FROM x
 
+
 SELECT dayname(dateadd(day, days, current_date())) day_of_week, DAY_NAME_ON(days) udf_dow
 FROM (VALUES (100), (200), (300)) AS t(days);
 
@@ -108,13 +109,14 @@ SELECT JS_DAY_NAME_ON(100,FALSE);
 
 
 SELECT dayname(dateadd(day, days, current_date())) day_of_week, JS_DAY_NAME_ON(days, use_abbr) udf_dow
-FROM (VALUES (100, TRUE), (200, TRUE), (300, TRUE)) AS t(days, use_abbr);
+FROM (VALUES (100, TRUE), (200, FALSE), (300, TRUE)) AS t(days, use_abbr);
 
 
 SET use_abbr = TRUE;
 
 SELECT JS_DAY_NAME_ON(days, $use_abbr) js_udf_dow, JS_DAY_NAME_ON(days) udf_dow
 FROM (VALUES (100), (200), (300)) AS t(days);
+
 
 CREATE OR REPLACE FUNCTION PY_DAY_NAME_ON(num_of_days INT)
 RETURNS STRING
@@ -182,6 +184,8 @@ SELECT COUNT(*) FROM DEMO_TABLE2;
 SHOW TABLES IN demo_schema;
 SHOW TABLES IN demo_db.demo_schema;
 
+SHOW FUNCTIONS IN demo_schema;
+
 
 CREATE OR REPLACE PROCEDURE TRUNCATE_ALL_TABLES_IN_SCHEMA(DATABASE_NAME STRING, SCHEMA_NAME STRING)
     RETURNS STRING
@@ -209,7 +213,56 @@ CALL TRUNCATE_ALL_TABLES_IN_SCHEMA('DEMO_DB', 'DEMO_SCHEMA');
 SELECT COUNT(*) FROM DEMO_TABLE1;
 SELECT COUNT(*) FROM DEMO_TABLE2;
 
+show tables in schema demo_db.demo_schema;
+
+
+CREATE OR REPLACE PROCEDURE concat_strings(S1 STRING, S2 STRING)
+    RETURNS STRING
+    LANGUAGE JAVASCRIPT
+    EXECUTE AS OWNER -- can also be executed as 'caller'
+    AS
+    $$
+        var result = S1 + S2;
+        return  result;
+    $$;
+
+CALL concat_strings('abc-', 'xyz');    
+
+SET qid = (SELECT last_query_id());
+
+SELECT *
+FROM TABLE(result_scan($qid));
+
+SET result = (SELECT concat_strings FROM TABLE(result_scan($qid)))
+
+SELECT $result
+
+CALL concat_strings($result, '-ddd')
+
+CALL concat_strings('abc-', 'xyz');
+SET result = (SELECT concat_strings FROM TABLE(result_scan(last_query_id())));
+CALL concat_strings($result, '-ddd');
+
+
+SELECT $1
+FROM TABLE(result_scan($qid)) 
+
+CALL concat_strings('abc-', 'xyz');
+SET result = (SELECT $1 FROM TABLE(result_scan(last_query_id())));
+CALL concat_strings($result, '-ddd');
+
+
+SELECT $1, $2
+FROM CITIBIKE.PUBLIC.TRIPS
+LIMIT 10
+
+SELECT *
+FROM CITIBIKE.PUBLIC.TRIPS
+LIMIT 10
+
 
 
 -- Clear objects
-DROP DATABASE DEMO_DB;
+--DROP DATABASE DEMO_DB;
+
+
