@@ -1,4 +1,4 @@
-/*----------------Snowflake Fundamentals 3-day class Lab:---------------------------
+/*----------------Snowflake Fundamentals 4-day class Lab:---------------------------
 1) Copy Into Command
 2) ON_ERROR attribute
 3) PATTERN attribute
