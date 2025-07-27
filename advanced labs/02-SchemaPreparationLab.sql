@@ -1,4 +1,4 @@
-/*----------------Snowflake Fundamentals 3-day class Lab:---------------------------
+/*----------------Snowflake Fundamentals 4-day class Lab:---------------------------
 1) Creating a Database
 2) Schemas
 3) Using External Stages
