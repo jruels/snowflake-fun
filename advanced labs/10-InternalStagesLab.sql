@@ -1,4 +1,4 @@
-/*----------------Snowflake Fundamentals 3-day class Lab:---------------------------
+/*----------------Snowflake Fundamentals 4-day class Lab:---------------------------
 1) Stage types
 2) Listing staged data files
 3) PUT command
