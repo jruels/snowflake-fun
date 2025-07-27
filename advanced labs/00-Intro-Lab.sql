@@ -1,4 +1,4 @@
-/* ----------------Snowflake Fundamentals 3-day class Lab:---------------------------
+/* ----------------Snowflake Fundamentals 4-day class Lab:---------------------------
 1) Defining context
 2) DESC command
 3) Using Shared databases
