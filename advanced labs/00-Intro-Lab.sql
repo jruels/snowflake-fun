@@ -26,3 +26,38 @@ grant all privileges on warehouse compute_wh to role sysadmin;
 
 use role sysadmin;
 
+-- Getting Account Details:
+
+SELECT CURRENT_ACCOUNT()
+
+show accounts;
+
+show accounts;
+SELECT *
+FROM TABLE(RESULT_SCAN(last_query_id()));
+
+show accounts;
+SELECT "organization_name", "account_name", "account_locator", "account_url", "account_locator_url"
+FROM TABLE(RESULT_SCAN(last_query_id()));
+
+
+show accounts;
+SELECT * 
+FROM (
+  SELECT "organization_name", "account_name", "account_locator", "account_url", "account_locator_url", 
+         'https://app.snowflake.com/' || LOWER("organization_name") || '/' || LOWER("account_name") AS "snowsight_url"
+  FROM TABLE(RESULT_SCAN(LAST_QUERY_ID()))
+)
+UNPIVOT (
+  value FOR key IN (
+    "organization_name",
+    "account_name",
+    "account_locator",
+    "account_url",
+    "account_locator_url",
+    "snowsight_url"
+  )
+);
+
+
+
